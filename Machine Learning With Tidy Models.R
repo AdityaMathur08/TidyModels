@@ -21,7 +21,7 @@ home_sales<- read.csv("Data/train.csv")
 home_split <- initial_split(home_sales,
                       prop =0.70 ,
                       strata = SalePrice)
-# here we are creating an rsample object, home_split usinf initial_split() 
+# here we are creating an rsample object, home_split using initial_split() 
 #function that contains instructions for randomly splitting home_sales data into training and test data
 
 # Create the training data
@@ -117,7 +117,7 @@ home_test_results <- home_test %>%
   cbind(home_predictions)
 
 # View results
-home_test_results
+home_test_results %>% head()
 
 
 #have trained a linear regression model and used it to predict the selling prices of homes
@@ -126,4 +126,62 @@ home_test_results
 #but the predicted values in the .pred column seem reasonable!
 
 
-# Step 3: Evaluating Model Performance ----
+# Step 3: Evaluating Model Performance- Yardstick Package ----
+
+# All Yardstick functions require a tibble with Model Results.
+#Tibble must contain :  1. Column with true outcome variable  
+#                       2. column with Model predictions(.pred)
+
+
+# A common performance metric for regression models is the root mean squared error, or RMSE. 
+
+
+# Caculate the RMSE metric
+home_test_results %>% 
+  rmse(truth =SalePrice , estimate = .pred)
+
+# The RMSE metric indicates that the average prediction error
+# for home selling prices is about $74587. 
+# Not bad considering you only used home_age and sqft_living as predictor variables!
+
+# Calculate the R squared metric
+home_test_results %>% 
+  rsq(truth =SalePrice , estimate = .pred)
+
+#The R squared metric ranges from 0 to 1, 0 being the worst and 1 the best.
+#Calculating the R squared value is only the first step in studying your model's predictions.
+#Making an R squared plot is extremely important because it will uncover potential problems with your model, such as non-linear patterns or regions where your model is either over or under-predicting the outcome variable.
+
+
+# Create an R squared plot of model performance
+ggplot(home_test_results, aes(x = SalePrice, y = .pred)) +
+  geom_point(alpha = 0.5) + 
+  geom_abline(color = 'blue', linetype = 2) +
+  coord_obs_pred() +
+  labs(x = 'Actual Home Selling Price', y = 'Predicted Selling Price')
+
+
+
+
+#machine learning pipeline and visualized the performance of your model.
+
+
+# Define a linear regression model
+linear_model <- linear_reg() %>% 
+  set_engine('lm') %>% 
+  set_mode('regression')
+
+# Train linear_model with last_fit()
+linear_fit <- linear_model %>% 
+  last_fit(SalePrice ~ ., split = home_split)
+
+# Collect predictions and view results
+predictions_df <- linear_fit %>% collect_predictions()
+predictions_df
+
+# Make an R squared plot using predictions_df
+ggplot(predictions_df, aes(x = SalePrice, y = .pred)) + 
+  geom_point(alpha = 0.5) + 
+  geom_abline(color = 'blue', linetype = 2) +
+  coord_obs_pred() +
+  labs(x = 'Actual Home Selling Price', y = 'Predicted Selling Price')
