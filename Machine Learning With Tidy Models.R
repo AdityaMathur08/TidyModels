@@ -77,7 +77,7 @@ home_test %>%
 
 
 # 2.1 Specify a linear regression model, linear_model----
-linear_model <- linear_reg() %>% 
+linear_model <- linear_reg() %>%  #General interface to linear Regression
   # Set the model engine
   set_engine('lm') %>% 
   # Set the model mode
