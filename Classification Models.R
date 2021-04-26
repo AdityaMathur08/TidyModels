@@ -82,4 +82,9 @@ leads_results
 
 #Your results tibble contains all the necessary columns for calculating 
 #classification metrics. Next, you'll use this tibble
-#and the yardstick package to evalute your model's performance.
+#and the yardstick package to evaluate your model's performance.
+
+leads_results %>% 
+  conf_mat(truth = Purchased,
+           estimate = .pred_class) %>%
+  summary()
