@@ -40,3 +40,8 @@ telecom_rec <- recipe(Churn ~ .,
 
 
 telecom_rec
+
+
+# To find out How many numeric and nominal predictor variables are encoded in the telecom_rec
+
+telecom_rec %>% summary()
