@@ -34,9 +34,10 @@ telecom_test <- telecom_split %>%  testing()
 #step_*() functions. Storing all of this information in a single recipe object
 #makes it easier to manage complex feature engineering pipelines and transform new data sources.
 
+# Step 2.1 Recipie Object ----
 telecom_rec <- recipe(Churn ~ .,
                       data = telecom_train) %>% 
-  step_log(DayMins, base = 10)
+  step_log(DayMins,DayCalls, base = 10)
 
 
 telecom_rec
@@ -45,3 +46,17 @@ telecom_rec
 # To find out How many numeric and nominal predictor variables are encoded in the telecom_rec
 
 telecom_rec %>% summary()
+
+# Step 2.2 Training recipie object with training  & Test data----
+
+telecom_log_rec_prep <- telecom_rec %>% 
+  prep(training = telecom_train)
+
+telecom_log_rec_prep
+
+telecom_log_rec_prep %>% 
+  bake(new_data = NULL)
+
+# Apply to test data
+telecom_log_rec_prep %>% 
+  bake(new_data = telecom_test)
